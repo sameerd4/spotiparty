@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Success</title>
+	<link rel = "stylesheet" href="/static/success.css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<!-- Web icons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_package_v0/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_package_v0/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon_package_v0/favicon-16x16.png">
+	<link rel="manifest" href="/static/favicon_package_v0/site.webmanifest">
+	<link rel="mask-icon" href="/static/favicon_package_v0/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="/static/favicon_package_v0/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="/static/favicon_package_v0/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+	<div id="container">	
+		<header>
+		</header>
+		<div id="main">	
+			<div id="middle">
+				<div id="middle_text">
+					<h1>Spotiparty</h1>
+					<div class="buttons">
+						<div id="button1">
+							<p id="button-text"><a href="{{ url_for('create_party') }}">Create Party</a></p>
+						</div>
+						<div id="button2">
+							<p id="button-text"><a href="{{ url_for('generate_playlist') }}">Join Party</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+    <div class="modal-content">
+        <div class="close">+</div>
+        <img src="/static/headphones.png" alt="" id="popup-logo">
+
+        <form id="playlist_info">
+            <label id="name" for="playlist-name">Name<br><input type="text" id="playlist-name" name="playlist_name" maxlength="100" placeholder="Enter a playlist name (Optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><br></label>
+            
+            <label id="desc" for = "playlist-description">Description<br><textarea id="playlist-description" name="playlist_desc" maxlength="230" placeholder="Enter a description (Optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></label> 
+            <input type="submit" id="pl_submit">
+        </form>
+
+    </div>
+</div>
+	<script src="/static/app.js"></script>
+	<script src="/static/modal.js"></script>
+</body>
+</html>
+

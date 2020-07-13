@@ -1,7 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import os
-from spotify_actions import req_auth, req_token, generate
+from spotify_actions import req_auth, req_token, generate, create_party_playlist
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import text
 from whitenoise import WhiteNoise
 
 '''
@@ -27,28 +29,39 @@ db.app = app
 
 class User(db.Model):
     spotify_id = db.Column(db.String(50), primary_key=True)
-    playlist_id = db.Column(db.String(40), unique=True, nullable=False)
+    playlist_id = db.Column(db.String(40), unique=False, nullable=False)
     first_name = db.Column(db.String(20), unique=False, nullable=True)
+    auth_token = db.Column(db.String(20), unique=False, nullable=True)
+    party_id = db.Column(db.Integer, unique=False, nullable=True)
+#    party_id = db.Column(db.Integer, db.ForeignKey('party.id'))
+#    party = relationship("Party", back_populates="users")
 
-    def __init__(self, user_id, playlist_id, first_name):
+
+    def __init__(self, user_id, playlist_id, first_name, token, party_id):
         self.spotify_id = user_id
         self.playlist_id = playlist_id
         self.first_name = first_name
+        self.auth_token = token
+        self.party_id = party_id
 
     def __repr__(self):
         return '<User %r>' % self.spotify_id
-
+'''
 class Party(db.Model):
-    party_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.String(40), unique=True, nullable=False)
-
+    users = relationship("User", back_populates="party")
 
     def __init__(self, id, playlist_id):
         self.spotify_id = usr_id
         self.playlist_id = playlist_id
 
-
+'''
 db.create_all()
+
+def get_members(party_id):
+    return User.query.filter_by(party_id=party_id)
+
 
 '''
 
@@ -95,9 +108,114 @@ def callback():
         token = req_token(code)
         session['token'] = token
 
-        return redirect(url_for('generate_playlist'))
+        return redirect(url_for('options'))
+
+@app.route('/options')
+def options():
+    return render_template('options.html')
 
 
+@app.route('/create_party', methods=['GET', 'POST'])
+def create_party():
+
+    if request.method == 'POST':
+        return redirect(url_for('success')) 
+    else:
+        
+        # TO DO: get custom playlist name and description from jquery post request
+        pl_name = session.get('pl_name')
+        pl_desc = session.get('pl_desc')
+
+        # Generate random 4-digit party ID
+        # TO DO: check that it's unique in the database
+        import random
+        party_id = random.randint(1000,9999)
+
+        # Store party ID in session
+        session['party_id'] = party_id
+
+        party_info = create_party_playlist(session.get('token'), pl_name, pl_desc)
+
+        host_first_name = str(party_info[0])
+        host_spotify_id = str(party_info[1])
+        party_playlist_id = str(party_info[2])
+
+        # Store playlist ID in session
+        session['party_playlist_id'] = party_playlist_id
+
+        found_user = User.query.filter_by(spotify_id=host_spotify_id).first()
+
+        if found_user:
+            found_user.auth_token = session.get('token')
+            found_user.party_id = party_id
+            found_user.playlist_id = party_playlist_id
+            db.session.commit()
+
+        else:
+            user = User(host_spotify_id, party_playlist_id, host_first_name, session.get('token'), party_id)
+            db.session.add(user)
+            db.session.commit()
+
+        return redirect(url_for('lobby'))
+
+
+
+@app.route('/lobby', methods=['GET', 'POST'])
+def lobby():
+    return render_template('lobby.html', party_id=session['party_id'], party_members = get_members(session['party_id']))
+
+@app.route('/start_party', methods=['GET', 'POST'])
+def start_party():
+
+    members = get_members(session['party_id'])
+
+    guest_tokens = [member.auth_token for member in members]
+
+    generate(guest_tokens[0], guest_tokens, session['party_playlist_id'])
+
+    return render_template('party.html', playlist_id=session['party_playlist_id'], party_id=session['party_id'], party_members = get_members(session['party_id']))
+
+
+'''
+
+@app.route('/join_party', methods=['GET', 'POST'])
+def join_party():
+
+    if request.method == 'POST':
+
+        # TO DO: get custom playlist name and description from jquery post request
+        pl_name = session.get('pl_name')
+        pl_desc = session.get('pl_desc')
+
+        # Generate random 4-digit party ID
+        # TO DO: check that it's unique in the database
+        import random
+        party_id = random.randint(1000,9999)
+
+        # Store party ID in session
+        session['party_id'] = party_id
+
+        token = session.get('token')
+
+        found_user = User.query.filter_by(spotify_id=user_spotify_id).first()
+
+        if found_user:
+            found_user.playlist_id = user_playlist_id
+            db.session.commit()
+
+        else:
+            user = User(user_spotify_id, user_playlist_id, user_first_name, token)
+            db.session.add(user)
+            db.session.commit()
+
+        return redirect(url_for('success'))
+
+    else:
+
+
+
+
+'''
 # Generate playlist view
 
 
@@ -109,6 +227,7 @@ def generate_playlist():
         # TO DO: get custom playlist name and description from jquery post request
         pl_name = session.get('pl_name')
         pl_desc = session.get('pl_desc')
+
 
 
         # Using token from Flask session, generate playlist
@@ -129,7 +248,7 @@ def generate_playlist():
             db.session.commit()
 
         else:
-            user = User(user_spotify_id, user_playlist_id, user_first_name)
+            user = User(user_spotify_id, user_playlist_id, user_first_name, token)
             db.session.add(user)
             db.session.commit()
 

@@ -122,3 +122,86 @@ def generate(token, name, desc):
         user_id, recommended_playlist_id, track_ids)
 
     return [first_name, user_id, recommended_playlist_id]
+
+
+def create_party_playlist(token, playlist_name, playlist_desc):
+    spotifyObject = spotipy.Spotify(auth=token)
+    user_id = str(spotifyObject.current_user()['id'])
+    first_name = spotifyObject.current_user()['display_name'].split()[0]
+
+    if playlist_name is None:
+        playlist_name = first_name + '\'s Party'
+        playlist_desc = ""
+
+    party_playlist = spotifyObject.user_playlist_create(
+        user_id, playlist_name, description=playlist_desc)
+
+    return [first_name, user_id, party_playlist['id']]
+
+def generate(host_token, guest_tokens, playlist_id):
+    spotifyObject = spotipy.Spotify(auth=host_token)
+    host_id = str(spotifyObject.current_user()['id'])
+
+    # Collect collective top tracks and artists
+
+    top_artists = {}
+    top_tracks = {}
+
+    for guest_token in guest_tokens:
+
+        guest_object = spotipy.Spotify(auth=guest_token)
+        
+        # Guest follows the playlist
+        guest_object.user_playlist_follow_playlist(host_id, playlist_id)
+
+        ranges = {'short_term': 8, 'medium_term': 9, 'long_term': 10}
+
+
+        for range in ranges.keys():   
+
+            guest_top_tracks = guest_object.current_user_top_tracks(limit=50, time_range=range)['items']
+
+            for track in guest_top_tracks:
+                if (track['name'], track['id']) in top_tracks:
+                    top_tracks[(track['name'], track['id'])] += ranges[range]
+                else:
+                    top_tracks[(track['name'], track['id'])] = ranges[range]
+
+            guest_top_artists = guest_object.current_user_top_artists(limit=50, time_range=range)['items']
+
+            for artist in guest_top_artists:
+                if (artist['name'], artist['id']) in top_artists:
+                    top_artists[(artist['name'], artist['id'])] += ranges[range]
+                else:
+                    top_artists[(artist['name'], artist['id'])] = ranges[range]
+                
+
+    sorted_artists = {k: v for k, v in sorted(top_artists.items(), key=lambda item: item[1], reverse=True)}
+    sorted_tracks = {k: v for k, v in sorted(top_tracks.items(), key=lambda item: item[1], reverse=True)}
+
+    top_5_artists = {k: sorted_artists[k] for k in list(sorted_artists)[-5:]}
+
+    # TO DO: given playlist length, determine number of top tracks to choose for playlist
+    n = (len(guest_tokens) / 2) * 20
+    print(n)
+
+    most_common_tracks = []
+    most_common_artists = []
+
+    for track in sorted_tracks:
+        print(track, sorted_tracks[track])
+        if sorted_tracks[track] < n:
+            break
+        else:
+            most_common_tracks.append(track[1])
+
+    for artist in sorted_artists:
+        print(artist, sorted_artists[artist])
+        if sorted_artists[artist] < n:
+            break
+        else:
+            most_common_artists.append(artist[1])
+
+    spotifyObject.user_playlist_add_tracks(
+        host_id, playlist_id, most_common_tracks)
+    
