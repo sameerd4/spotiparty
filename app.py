@@ -183,7 +183,7 @@ def start_party():
 
     guest_tokens = [member.auth_token for member in members]
 
-    generate(guest_tokens[0], guest_tokens, session['party_playlist_id'])
+    generate(session['token'], guest_tokens, session['party_playlist_id'])
 
     return render_template('party.html', playlist_id=session['party_playlist_id'], party_id=session['party_id'], party_members = get_members(session['party_id']))
 
