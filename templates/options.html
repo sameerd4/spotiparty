@@ -28,7 +28,7 @@
 							<p id="button-text"><a href="{{ url_for('create_party') }}">Create Party</a></p>
 						</div>
 						<div id="button2">
-							<p id="button-text"><a href="{{ url_for('generate_playlist') }}">Join Party</a></p>
+							<p id="button-text"><a href="{{ url_for('join_party') }}">Join Party</a></p>
 						</div>
 					</div>
 				</div>
@@ -36,18 +36,6 @@
 		</div>
 
 	</div>
-    <div class="modal-content">
-        <div class="close">+</div>
-        <img src="/static/headphones.png" alt="" id="popup-logo">
-
-        <form id="playlist_info">
-            <label id="name" for="playlist-name">Name<br><input type="text" id="playlist-name" name="playlist_name" maxlength="100" placeholder="Enter a playlist name (Optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><br></label>
-            
-            <label id="desc" for = "playlist-description">Description<br><textarea id="playlist-description" name="playlist_desc" maxlength="230" placeholder="Enter a description (Optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></label> 
-            <input type="submit" id="pl_submit">
-        </form>
-
-    </div>
 </div>
 	<script src="/static/app.js"></script>
 	<script src="/static/modal.js"></script>
