@@ -148,7 +148,7 @@ def generate(host_token, guest_tokens, playlist_id):
     top_tracks = {}
 
     for guest_token in guest_tokens:
-
+        print(guest_token)
         guest_object = spotipy.Spotify(auth=guest_token)
         
         # Guest follows the playlist
@@ -202,8 +202,30 @@ def generate(host_token, guest_tokens, playlist_id):
         else:
             most_common_artists.append(artist[1])
 
+
+    most_common_tracks = most_common_tracks[:20]
+
+    recommended_tracks = spotifyObject.recommendations(
+        seed_artists=most_common_artists[:5], limit=15)
+    track_ids = []
+    for track in recommended_tracks['tracks']:
+        track_ids.append(track['id'])
+
+    recommended_tracks = spotifyObject.recommendations(
+        seed_artists=most_common_artists[5:10], limit=15)
+    for track in recommended_tracks['tracks']:
+        track_ids.append(track['id'])
+
+    track_ids.extend(most_common_tracks)
+
+    print(track_ids)
+
+    import random
+    random.shuffle(track_ids)
+
+
     spotifyObject.user_playlist_add_tracks(
-        host_id, playlist_id, most_common_tracks)
+        host_id, playlist_id, track_ids)
 
 
 def get_user(token):
