@@ -204,4 +204,13 @@ def generate(host_token, guest_tokens, playlist_id):
 
     spotifyObject.user_playlist_add_tracks(
         host_id, playlist_id, most_common_tracks)
-    
+
+
+def get_user(token):
+    spotifyObject = spotipy.Spotify(auth=token)
+
+    user = spotifyObject.me()
+    profile_image = "https://lh3.googleusercontent.com/eN0IexSzxpUDMfFtm-OyM-nNs44Y74Q3k51bxAMhTvrTnuA4OGnTi_fodN4cl-XxDQc"
+    if user['images']:
+        profile_image = user['images'][0]
+    return [user['display_name'].split()[0], user['id'], profile_image]

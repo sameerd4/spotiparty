@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel = "stylesheet"
+	href = "/static/levels.css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<!-- Web icons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_package_v0/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_package_v0/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon_package_v0/favicon-16x16.png">
+	<link rel="manifest" href="/static/favicon_package_v0/site.webmanifest">
+	<link rel="mask-icon" href="/static/favicon_package_v0/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="/static/favicon_package_v0/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="/static/favicon_package_v0/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+</head>
+
+<body id="generate_playlist">	
+	
+	<div id="container">
+		<!-- header -->
+		<header>
+		</header>
+		<!-- middle -->
+		<div id="main">
+			<div class="middle">
+				<div class="middle-container">
+					<div class="middle-items">
+						<h1 class="middle-text">Enter the party code:</h1>
+
+                        <form action="#" method="POST">
+                            <div class="input-level">
+                                <div class = "input-label">
+                                    <p>Party Code</p>
+                                </div>
+                                <input id='levels-btn' name='party_code' title="A valid party code" required pattern={{reg_ex}} placeholder="Enter a 4-digit party code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                            <input type='submit' id='generate-btn' value='Join Party'>
+                        </form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="/static/app.js"></script>
+	<script src="/static/modal.js"></script>
+</body>
+</html>

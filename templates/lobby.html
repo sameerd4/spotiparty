@@ -29,11 +29,13 @@
                           <h1>{{ member.first_name }}</h1>
                         {% endfor %}
                     </ul>
+                    {% if host %}
 					<div class="buttons">
 						<div id="button1">
                             <p id="button-text"><a href="{{ url_for('start_party') }}">Start Party</a></p>
 						</div>
-					</div>
+                    </div>
+                    {% endif %}
 				</div>
 			</div>
 		</div>
