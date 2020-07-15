@@ -33,6 +33,7 @@ class User(db.Model):
     first_name = db.Column(db.String(20), unique=False, nullable=True)
     auth_token = db.Column(db.String(20), unique=False, nullable=True)
     party_id = db.Column(db.Integer, unique=False, nullable=True)
+    party_on = db.Column(db.BOOLEAN, unique=False, nullable=True)
 #    host = db.Column(db.BOOLEAN, unique=False, nullable=True)
 #    party_on = db.Column(db.BOOLEAN, unique=False, nullable=True)
 #    party_id = db.Column(db.Integer, db.ForeignKey('party.id'))
@@ -45,6 +46,7 @@ class User(db.Model):
         self.first_name = first_name
         self.auth_token = token
         self.party_id = party_id
+        self.party_on = False
 #        self.host = host
 #        self.party_on = False
 
@@ -158,7 +160,7 @@ def create_party():
             found_user.auth_token = session.get('token')
             found_user.party_id = party_id
             found_user.playlist_id = party_playlist_id
-            found_user.host = True
+#            found_user.host = True
             db.session.commit()
 
         else:
@@ -173,6 +175,13 @@ def create_party():
 @app.route('/lobby', methods=['GET', 'POST'])
 def lobby():
 
+    party_on = False
+
+    for party_member in get_members(session['party_id']):
+        if party_member.party_on:
+            party_on = True
+            return render_template('party.html', playlist_id=session['party_playlist_id'], party_id=session['party_id'], party_members = get_members(session['party_id'])) 
+
     # Check if user is a host or not 
     return render_template('lobby.html', host=session['host_status'], party_id=session['party_id'], party_members = get_members(session['party_id']))
 
@@ -184,6 +193,11 @@ def start_party():
     guest_tokens = [member.auth_token for member in members]
 
     generate(session['token'], guest_tokens, session['party_playlist_id'])
+
+    user = User.query.filter_by(spotify_id=host_spotify_id).first()
+    user.party_on = True
+    db.session.commit()
+
 
     return render_template('party.html', playlist_id=session['party_playlist_id'], party_id=session['party_id'], party_members = get_members(session['party_id']))
 
