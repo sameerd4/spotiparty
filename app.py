@@ -180,7 +180,7 @@ def lobby():
     for party_member in get_members(session['party_id']):
         if party_member.party_on:
             party_on = True
-            return render_template('party.html', playlist_id=session['party_playlist_id'], party_id=session['party_id'], party_members = get_members(session['party_id'])) 
+            return render_template('party.html', playlist_id=party_member.playlist_id, party_id=session['party_id'], party_members = get_members(session['party_id'])) 
 
     # Check if user is a host or not 
     return render_template('lobby.html', host=session['host_status'], party_id=session['party_id'], party_members = get_members(session['party_id']))
