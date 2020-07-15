@@ -152,6 +152,7 @@ def create_party():
         party_playlist_id = str(party_info[2])
 
         # Store playlist ID in session
+        session['spotify_id'] = host_spotify_id
         session['party_playlist_id'] = party_playlist_id
 
         found_user = User.query.filter_by(spotify_id=host_spotify_id).first()
@@ -177,11 +178,14 @@ def create_party():
 @app.route('/lobby', methods=['GET', 'POST'])
 def lobby():
 
-    party_on = False
+    found_user = User.query.filter_by(spotify_id=session['spotify_id']).first()
+    found_user.party_on = False
+    db.session.commit()
 
     for party_member in get_members(session['party_id']):
         if party_member.party_on:
-            party_on = True
+            found_user.party_on = True
+            db.session.commit()
             return render_template('party.html', playlist_id=party_member.playlist_id, party_id=session['party_id'], party_members = get_members(session['party_id'])) 
 
     # Check if user is a host or not 
@@ -227,6 +231,8 @@ def join_party():
         user_first_name = str(spotify_info[0])
         user_spotify_id = str(spotify_info[1])
         profile_image = str(spotify_info[2]) #TO DO
+
+        session['spotify_id'] = user_spotify_id
 
         found_user = User.query.filter_by(spotify_id=user_spotify_id).first()
 
