@@ -160,11 +160,13 @@ def create_party():
             found_user.auth_token = session.get('token')
             found_user.party_id = party_id
             found_user.playlist_id = party_playlist_id
+            found_user.party_on = False
 #            found_user.host = True
             db.session.commit()
 
         else:
             user = User(host_spotify_id, party_playlist_id, host_first_name, session.get('token'), party_id)
+            user.party_on = False
             db.session.add(user)
             db.session.commit()
 
