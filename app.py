@@ -194,7 +194,7 @@ def start_party():
 
     generate(session['token'], guest_tokens, session['party_playlist_id'])
 
-    user = User.query.filter_by(spotify_id=host_spotify_id).first()
+    user = User.query.filter_by(party_id=session['party_id']).first()
     user.party_on = True
     db.session.commit()
 
