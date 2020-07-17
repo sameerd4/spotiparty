@@ -1,14 +1,16 @@
-import sys
+import base64
+import datetime
+import json
 import os
-import spotipy
-import spotipy.util as util
 import random
 import string
-import requests
+import sys
+from collections import Counter
 from urllib.parse import quote
-import base64
-import json
-import datetime
+
+import requests
+import spotipy
+import spotipy.util as util
 
 client_id = os.environ.get("CLIENT_ID")
 client_secret = os.environ.get("CLIENT_SECRET")
@@ -144,83 +146,136 @@ def generate(host_token, guest_tokens, playlist_id):
 
     # Collect collective top tracks and artists
 
-    top_artists = {}
-    top_tracks = {}
+#    library_list = []
+    top_artists_list = []
+    top_tracks_list = []
 
     for guest_token in guest_tokens:
         print(guest_token)
         guest_object = spotipy.Spotify(auth=guest_token)
-        
+
         # Guest follows the playlist
         guest_object.user_playlist_follow_playlist(host_id, playlist_id)
+        
+        '''
+        # Collect guest library
+        guest_saved_tracks_ids = set()
+        offset = 0
+        guest_saved_tracks = guest_object.current_user_saved_tracks(limit=50, offset=offset)['items']
+
+        while len(guest_saved_tracks) > 0:
+            for track in guest_saved_tracks:
+                guest_saved_tracks_ids.add(track['track']['id'])
+            
+            offset += 50
+            guest_saved_tracks = guest_object.current_user_saved_tracks(limit=50, offset=offset)['items']
+
+        library_list.append(guest_saved_tracks_ids)
+        '''
 
         ranges = {'short_term': 8, 'medium_term': 9, 'long_term': 10}
 
+        guest_top_tracks = {}
+        guest_top_artists = {}
 
         for range in ranges.keys():   
 
-            guest_top_tracks = guest_object.current_user_top_tracks(limit=50, time_range=range)['items']
-
-            for track in guest_top_tracks:
-                if (track['name'], track['id']) in top_tracks:
-                    top_tracks[(track['name'], track['id'])] += ranges[range]
+            guest_top_tracks_range = guest_object.current_user_top_tracks(limit=50, time_range=range)['items']
+            
+            for track in guest_top_tracks_range:
+                if (track['name'], track['id']) in guest_top_tracks:
+                    guest_top_tracks[(track['name'], track['id'])] += ranges[range]
                 else:
-                    top_tracks[(track['name'], track['id'])] = ranges[range]
-
-            guest_top_artists = guest_object.current_user_top_artists(limit=50, time_range=range)['items']
-
-            for artist in guest_top_artists:
-                if (artist['name'], artist['id']) in top_artists:
-                    top_artists[(artist['name'], artist['id'])] += ranges[range]
+                    guest_top_tracks[(track['name'], track['id'])] = ranges[range]
+            '''
+            for track in guest_top_tracks_range:
+                if track['name'] in guest_top_tracks:
+                    guest_top_tracks[track['name']] += ranges[range]
                 else:
-                    top_artists[(artist['name'], artist['id'])] = ranges[range]
-                
+                    guest_top_tracks[track['name']] = ranges[range]
+            '''
+            
+            guest_top_artists_range = guest_object.current_user_top_artists(limit=50, time_range=range)['items']
+            
+            for artist in guest_top_artists_range:
+                if (artist['name'], artist['id']) in guest_top_artists:
+                    guest_top_artists[(artist['name'], artist['id'])] += ranges[range]
+                else:
+                    guest_top_artists[(artist['name'], artist['id'])] = ranges[range]
+            '''
+            for artist in guest_top_artists_range:
+                if artist['name'] in guest_top_artists:
+                    guest_top_artists[artist['name']] += ranges[range]
+                else:
+                    guest_top_artists[artist['name']] = ranges[range]
+            '''
 
-    sorted_artists = {k: v for k, v in sorted(top_artists.items(), key=lambda item: item[1], reverse=True)}
-    sorted_tracks = {k: v for k, v in sorted(top_tracks.items(), key=lambda item: item[1], reverse=True)}
+        top_tracks_list.append(guest_top_tracks)
+        top_artists_list.append(guest_top_artists)
 
-    top_5_artists = {k: sorted_artists[k] for k in list(sorted_artists)[-5:]}
+    group_favorite_tracks = [list(ttdict.keys()) for ttdict in top_tracks_list]
+    group_favorite_artists = [list(tadict.keys()) for tadict in top_artists_list]
 
-    # TO DO: given playlist length, determine number of top tracks to choose for playlist
-    n = (len(guest_tokens) / 2) * 20
-    print(n)
+    from itertools import chain
+    group_favorite_tracks_counter = Counter(chain(*group_favorite_tracks))
+    group_favorite_artists_counter = Counter(chain(*group_favorite_artists)) 
 
-    most_common_tracks = []
-    most_common_artists = []
+    print(group_favorite_tracks_counter)
+    print(group_favorite_artists_counter)
 
-    for track in sorted_tracks:
-        print(track, sorted_tracks[track])
-        if sorted_tracks[track] < n:
-            break
+    favorite_track_candidates = set()
+
+    for track in group_favorite_tracks_counter:
+        if group_favorite_tracks_counter[track] >= 2 and len(guest_tokens) in [2,3]:
+            favorite_track_candidates.add(track)
         else:
-            most_common_tracks.append(track[1])
+            if group_favorite_tracks_counter[track] > (len(guest_tokens) / 2 + 1):
+                favorite_track_candidates.add(track)
 
-    for artist in sorted_artists:
-        print(artist, sorted_artists[artist])
-        if sorted_artists[artist] < n:
-            break
-        else:
-            most_common_artists.append(artist[1])
+    print(len(favorite_track_candidates))
+    if len(favorite_track_candidates) < 20:
+        diff = 20 - len(favorite_track_candidates)
+        num_tracks_to_get_from_guest = diff // len(guest_tokens)
 
+        for guest_tracks_dict in top_tracks_list:
+            favorite_track_candidates.update(random.sample(list(guest_tracks_dict.keys()), num_tracks_to_get_from_guest))
+    else:
+        favorite_track_candidates = set(random.sample(favorite_track_candidates, 20))
 
-    most_common_tracks = most_common_tracks[:20]
-
-    recommended_tracks = spotifyObject.recommendations(
-        seed_artists=most_common_artists[:5], limit=15)
+    print(favorite_track_candidates)
     track_ids = []
+    favorite_artist_candidates = set()
+
+    for artist in group_favorite_artists_counter:
+        if group_favorite_artists_counter[artist] >= 2 and len(guest_tokens) in [2,3]:
+            favorite_artist_candidates.add(artist)
+        else:
+            if group_favorite_artists_counter[artist] > (len(guest_tokens) / 2 + 1):
+                favorite_artist_candidates.add(artist)
+
+    print(len(favorite_artist_candidates))
+    if len(favorite_artist_candidates) < 20:
+        diff = 20 - len(favorite_artist_candidates)
+        num_artists_to_get_from_guest = diff // len(guest_tokens)
+
+        for guest_artists_dict in top_artists_list:
+            favorite_artist_candidates.update(random.sample(list(guest_artists_dict.keys()), num_artists_to_get_from_guest))
+
+    seed_artists_ids = [i[1] for i in group_favorite_artists_counter]
+
+    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
     for track in recommended_tracks['tracks']:
         track_ids.append(track['id'])
-
-    recommended_tracks = spotifyObject.recommendations(
-        seed_artists=most_common_artists[5:10], limit=15)
+    
+    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
     for track in recommended_tracks['tracks']:
         track_ids.append(track['id'])
-
-    track_ids.extend(most_common_tracks)
+        
+    track_ids.extend([i[1] for i in favorite_track_candidates])
 
     print(track_ids)
 
-    import random
+    
     random.shuffle(track_ids)
 
 
@@ -236,3 +291,7 @@ def get_user(token):
     if user['images']:
         profile_image = user['images'][0]
     return [user['display_name'].split()[0], user['id'], profile_image]
+
+
+token = 'BQCHVmBGyllt4lif9iNVeryFvDPjGMEKVdBJ7t3AX8W1FHhXW5_7gH1NI1MtOr3MOcG4Tu_45Rshm-O20U9rGmTfYGxklAdmsv6EJQz41W-dWO2BpzgJLsy5v9eAULBw-ZWTaivZLOFqFjoLEwgvkxpGxA5wNh02qfLu9x_XxIQapQ6OwRThdXeaoOmyNqwHZD3iCuZPH1tJfdgNtKAY_p4XJdOoJpAprXYTt7vZkAyM9NXe653WS_c' 
+lol = generate(token, [token, token], '6QPrejWH5ugdCkMUo5Docx')  
