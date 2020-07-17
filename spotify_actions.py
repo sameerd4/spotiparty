@@ -303,6 +303,3 @@ def get_user(token):
         profile_image = user['images'][0]
     return [user['display_name'].split()[0], user['id'], profile_image]
 
-
-token = 'BQC6nyJGhJdQTvwTTRH9jDTye4WNz58euvkZtC-t5CnD_CbOdYx4O46694E6IjPfuOwPT_3TTkgeRhfhbWeUZ2VpZOh7uMVxPvc3kRo4ckYJweQk1IFLxwU2k5v-zQbp8NrscCpqPYmKEkemFaJi5LQi6dKElHkdc00BHqs_oDbVwQ6vAN04xwiHFh4' 
-lol = generate(token, [token], '6QPrejWH5ugdCkMUo5Docx')  

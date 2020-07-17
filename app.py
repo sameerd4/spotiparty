@@ -14,7 +14,6 @@ App Config
 
 
 app = Flask(__name__)
-#app.secret_key = 'bruh'.encode('utf8')
 app.secret_key = os.environ.get('SESSION_SECRET')
 app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/')
 
@@ -35,7 +34,6 @@ class User(db.Model):
     party_id = db.Column(db.Integer, unique=False, nullable=True)
     party_on = db.Column(db.BOOLEAN, unique=False, nullable=True)
 #    host = db.Column(db.BOOLEAN, unique=False, nullable=True)
-#    party_on = db.Column(db.BOOLEAN, unique=False, nullable=True)
 #    party_id = db.Column(db.Integer, db.ForeignKey('party.id'))
 #    party = relationship("Party", back_populates="users")
 
@@ -52,17 +50,7 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.spotify_id
-'''
-class Party(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    playlist_id = db.Column(db.String(40), unique=True, nullable=False)
-    users = relationship("User", back_populates="party")
 
-    def __init__(self, id, playlist_id):
-        self.spotify_id = usr_id
-        self.playlist_id = playlist_id
-
-'''
 db.create_all()
 
 def get_members(party_id):
@@ -72,6 +60,7 @@ def get_members(party_id):
 def get_parties():
     users = User.query.filter_by()
     return {user.party_id for user in users}
+
 '''
 
 Views
@@ -265,58 +254,6 @@ def join_party():
 
 
 
-# Generate playlist view
-
-
-@app.route('/generate_playlist', methods=['GET', 'POST'])
-def generate_playlist():
-
-    if request.method == 'POST':
-
-        # TO DO: get custom playlist name and description from jquery post request
-        pl_name = session.get('pl_name')
-        pl_desc = session.get('pl_desc')
-
-
-
-        # Using token from Flask session, generate playlist
-        token = session.get('token')
-        user_info = generate(token, pl_name, pl_desc)
-
-        user_first_name = str(user_info[0])
-        user_spotify_id = str(user_info[1])
-        user_playlist_id = str(user_info[2])
-
-        # Store playlist ID in session
-        session['user_pl_id'] = user_playlist_id
-
-        found_user = User.query.filter_by(spotify_id=user_spotify_id).first()
-
-        if found_user:
-            found_user.playlist_id = user_playlist_id
-            db.session.commit()
-
-        else:
-            user = User(user_spotify_id, user_playlist_id, user_first_name, token)
-            db.session.add(user)
-            db.session.commit()
-
-        return redirect(url_for('success'))
-
-    else:
-        if session.get('token'):
-            session.pop('pl_name', None)
-            session.pop('pl_desc', None)
-
-            # Load playlist generator page
-            return render_template('generate_playlist.html', title='generate playlist')
-        else:
-
-            # Return home if user attempts to access page without going through
-            # proper authorization
-            return redirect(url_for('home'))
-
-
 # Update modal form (backend page)
 
 
@@ -324,7 +261,7 @@ def generate_playlist():
 def update():
 
     if request.method == 'POST':
-
+        #TODO
         # Get custom playlist name from jquery post
         pl_name = request.form.get('name')
         pl_desc = request.form.get('desc')
