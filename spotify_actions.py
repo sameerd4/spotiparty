@@ -261,7 +261,8 @@ def generate(host_token, guest_tokens, playlist_id):
         for guest_artists_dict in top_artists_list:
             favorite_artist_candidates.update(random.sample(list(guest_artists_dict.keys()), num_artists_to_get_from_guest))
 
-    seed_artists_ids = [i[1] for i in group_favorite_artists_counter]
+    seed_artists_ids = [i[1] for i in favorite_artist_candidates]
+    seed_artists_ids = random.sample(seed_artists_ids, 10)
 
     if len(guest_tokens) > 1:
         recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
@@ -303,3 +304,7 @@ def get_user(token):
         profile_image = user['images'][0]
     return [user['display_name'].split()[0], user['id'], profile_image]
 
+token1 = 'BQB8ApPzlQNocs5vyzWsxAIZjgVQrY54GVRLZWKQOo2Klm8Tr0JmURaDCAXnF43am-6ReExWhJlMg_uYoctvRs8F-70LM3pAfFjNl7xb-kXvl5sreD5YHH8pV6J1xiVdfG1K4-Biv9UXNzOVSBchv77bB9lzstyUikAsGREvkdcEYiqvulTuNJW51yg'
+token2 = 'BQCqKuKcsQqrasJqDywTcSoYLRykgXSxz3P60LRiqZtYc6d_oPd8FM4OLRUBNIYVsloZOuxszJhSIf7zGNMlupZamcx2jubOlpG1jOkmCk90uauVJ0Jc-jZl8V0vxJY2I5cqhPrHtR5Hq9RXcjnrsOISodGXq1A3vLV9DoeEFTYrgHb1jg2Oic1Juo8R'
+
+generate(token1, [token1, token2], '4UBqwKjN1qucuNyrhLEoiA')
