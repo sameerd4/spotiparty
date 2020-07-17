@@ -304,7 +304,7 @@ def get_user(token):
         profile_image = user['images'][0]
     return [user['display_name'].split()[0], user['id'], profile_image]
 
-token1 = 'BQB8ApPzlQNocs5vyzWsxAIZjgVQrY54GVRLZWKQOo2Klm8Tr0JmURaDCAXnF43am-6ReExWhJlMg_uYoctvRs8F-70LM3pAfFjNl7xb-kXvl5sreD5YHH8pV6J1xiVdfG1K4-Biv9UXNzOVSBchv77bB9lzstyUikAsGREvkdcEYiqvulTuNJW51yg'
-token2 = 'BQCqKuKcsQqrasJqDywTcSoYLRykgXSxz3P60LRiqZtYc6d_oPd8FM4OLRUBNIYVsloZOuxszJhSIf7zGNMlupZamcx2jubOlpG1jOkmCk90uauVJ0Jc-jZl8V0vxJY2I5cqhPrHtR5Hq9RXcjnrsOISodGXq1A3vLV9DoeEFTYrgHb1jg2Oic1Juo8R'
+#token1 = 'BQB8ApPzlQNocs5vyzWsxAIZjgVQrY54GVRLZWKQOo2Klm8Tr0JmURaDCAXnF43am-6ReExWhJlMg_uYoctvRs8F-70LM3pAfFjNl7xb-kXvl5sreD5YHH8pV6J1xiVdfG1K4-Biv9UXNzOVSBchv77bB9lzstyUikAsGREvkdcEYiqvulTuNJW51yg'
+#token2 = 'BQCqKuKcsQqrasJqDywTcSoYLRykgXSxz3P60LRiqZtYc6d_oPd8FM4OLRUBNIYVsloZOuxszJhSIf7zGNMlupZamcx2jubOlpG1jOkmCk90uauVJ0Jc-jZl8V0vxJY2I5cqhPrHtR5Hq9RXcjnrsOISodGXq1A3vLV9DoeEFTYrgHb1jg2Oic1Juo8R'
 
-generate(token1, [token1, token2], '4UBqwKjN1qucuNyrhLEoiA')
+#generate(token1, [token1, token2], '4UBqwKjN1qucuNyrhLEoiA')
