@@ -229,7 +229,7 @@ def generate(host_token, guest_tokens, playlist_id):
         if group_favorite_tracks_counter[track] >= 2 and len(guest_tokens) in [2,3]:
             favorite_track_candidates.add(track)
         else:
-            if group_favorite_tracks_counter[track] > (len(guest_tokens) / 2 + 1):
+            if group_favorite_tracks_counter[track] >= (len(guest_tokens) // 2):
                 favorite_track_candidates.add(track)
 
     print(len(favorite_track_candidates))
@@ -250,7 +250,7 @@ def generate(host_token, guest_tokens, playlist_id):
         if group_favorite_artists_counter[artist] >= 2 and len(guest_tokens) in [2,3]:
             favorite_artist_candidates.add(artist)
         else:
-            if group_favorite_artists_counter[artist] > (len(guest_tokens) / 2 + 1):
+            if group_favorite_artists_counter[artist] >= (len(guest_tokens) // 2):
                 favorite_artist_candidates.add(artist)
 
     print(len(favorite_artist_candidates))
