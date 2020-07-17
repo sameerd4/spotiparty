@@ -263,14 +263,25 @@ def generate(host_token, guest_tokens, playlist_id):
 
     seed_artists_ids = [i[1] for i in group_favorite_artists_counter]
 
-    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
-    for track in recommended_tracks['tracks']:
-        track_ids.append(track['id'])
-    
-    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
-    for track in recommended_tracks['tracks']:
-        track_ids.append(track['id'])
+    if len(guest_tokens) > 1:
+        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
+        for track in recommended_tracks['tracks']:
+            track_ids.append(track['id'])
         
+        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
+        for track in recommended_tracks['tracks']:
+            track_ids.append(track['id'])
+
+    else:
+        top_artists_ids = [i[1] for i in top_artists_list]
+        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
+        for track in recommended_tracks['tracks']:
+            track_ids.append(track['id'])
+        
+        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
+        for track in recommended_tracks['tracks']:
+            track_ids.append(track['id'])
+
     track_ids.extend([i[1] for i in favorite_track_candidates])
 
     print(track_ids)
