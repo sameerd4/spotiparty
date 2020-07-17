@@ -273,7 +273,7 @@ def generate(host_token, guest_tokens, playlist_id):
             track_ids.append(track['id'])
 
     else:
-        top_artists_ids = [i[1] for i in top_artists_list]
+        top_artists_ids = [i[1] for i in favorite_artist_candidates]
         recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
         for track in recommended_tracks['tracks']:
             track_ids.append(track['id'])
@@ -304,5 +304,5 @@ def get_user(token):
     return [user['display_name'].split()[0], user['id'], profile_image]
 
 
-token = 'BQCHVmBGyllt4lif9iNVeryFvDPjGMEKVdBJ7t3AX8W1FHhXW5_7gH1NI1MtOr3MOcG4Tu_45Rshm-O20U9rGmTfYGxklAdmsv6EJQz41W-dWO2BpzgJLsy5v9eAULBw-ZWTaivZLOFqFjoLEwgvkxpGxA5wNh02qfLu9x_XxIQapQ6OwRThdXeaoOmyNqwHZD3iCuZPH1tJfdgNtKAY_p4XJdOoJpAprXYTt7vZkAyM9NXe653WS_c' 
-lol = generate(token, [token, token], '6QPrejWH5ugdCkMUo5Docx')  
+token = 'BQC6nyJGhJdQTvwTTRH9jDTye4WNz58euvkZtC-t5CnD_CbOdYx4O46694E6IjPfuOwPT_3TTkgeRhfhbWeUZ2VpZOh7uMVxPvc3kRo4ckYJweQk1IFLxwU2k5v-zQbp8NrscCpqPYmKEkemFaJi5LQi6dKElHkdc00BHqs_oDbVwQ6vAN04xwiHFh4' 
+lol = generate(token, [token], '6QPrejWH5ugdCkMUo5Docx')  
