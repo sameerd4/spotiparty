@@ -1,10 +1,16 @@
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import os
-from spotify_actions import req_auth, req_token, generate, create_party_playlist, get_user
+import os.path
+from os import path
+
+from flask import (
+    Flask, jsonify, redirect, render_template, request, session, url_for)
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import text
 from whitenoise import WhiteNoise
+
+from spotify_actions import (create_party_playlist, generate, get_user,
+                             req_auth, req_token)
 
 '''
 
@@ -51,7 +57,10 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.spotify_id
 
-db.create_all()
+db_file_name = os.environ.get('DB_REDIRECT_URI')
+db_file_name = db_file_name[3 + db_file_name.index('/')]
+if not path.exists("db_file_name"):    
+    db.create_all()
 
 def get_members(party_id):
     return User.query.filter_by(party_id=party_id)
