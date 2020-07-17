@@ -59,7 +59,7 @@ class User(db.Model):
 
 db_file_name = os.environ.get('DB_REDIRECT_URI')
 db_file_name = db_file_name[3 + db_file_name.index('/'):]
-if not path.exists("db_file_name"):    
+if not path.exists(db_file_name):    
     db.create_all()
 
 def get_members(party_id):
