@@ -70,13 +70,14 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.spotify_id
-
+'''
 db_file_name = os.environ.get('DB_REDIRECT_URI')
 db_file_name = db_file_name[3 + db_file_name.index('/'):]
 print(db_file_name)
 print(path.exists(db_file_name))
 if not path.exists(db_file_name):    
-    db.create_all()
+'''
+db.create_all()
 
 def get_members(party_id):
     return User.query.filter_by(party_id=party_id)
