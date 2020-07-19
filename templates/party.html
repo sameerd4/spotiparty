@@ -74,22 +74,19 @@ td {
 <body>	
 		<header>
         </header>
-        <div class="row">
-            <div class="column">
-          <iframe src="https://open.spotify.com/embed/playlist/{{playlist_id}}" width="600" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-            </div>
-            <div class="column">
-                <ul>
-                  <h1>Guest List:</h1>
-                  <ul>
+        <div id="middle">
+          <div id="middle_text">
+                      <h1>Your Playlist:</h1><br><br>
+                      <iframe src="https://open.spotify.com/embed/playlist/{{playlist_id}}" width="380" height="300" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                      <br><br><br>
+                      <h1>Guest List:</h1>
         
                     <table id="member_list" border='1'>
                     </table>
         
-                  </ul>
-                </ul>
-            </div>
           </div>
+        </div>
+
 
 	<script src="/static/app.js"></script>
 </body>
