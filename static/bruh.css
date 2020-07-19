@@ -19,16 +19,14 @@ body {
     scroll-behavior: smooth;
     overflow-x: hidden;
 
-}
-
+} 
+/*
 html {
     overflow-x: hidden;
     height: 100%;
 }
-
-
-
-{
+*/
+h1 {
     font-family: Source Sans Pro;
     font-size: 3rem;
     color: white;
@@ -50,13 +48,13 @@ html {
 }
 
 #main {
-/*		padding-bottom: 110px;
+    padding-bottom: 110px;
     overflow: auto;
-    margin: 0 auto; */
+    margin: 0 auto;
 }
 
 
-/*
+
 .logo {
     margin: 0px auto 0px 30px;
     
@@ -68,6 +66,17 @@ html {
     shape-rendering: crispEdges;
 
 }
+
+.navbar h1 {
+    font-family: Source Sans Pro;
+    color: white;
+    font-size: 2rem;
+
+    
+
+
+}
+
 
 .header-subtext {
     color: white;
@@ -86,7 +95,7 @@ html {
     animation-fill-mode: forwards;
 
 }
-*/
+
 header {
     /*background-color: #292929;*/
     position: relative;
@@ -570,13 +579,4 @@ width: 60px;
 border-radius: 30px;
 margin-left: calc(50% - 30px);
 margin-top: 10px;
-}
-
-table {
-border: none;
-border-collapse: separate;
-}
-
-td {
-border: none;
 }
