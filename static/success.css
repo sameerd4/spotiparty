@@ -1,7 +1,7 @@
 	@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap');
 	@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-	* {
+/*	* {
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
@@ -19,14 +19,16 @@
 		scroll-behavior: smooth;
 		overflow-x: hidden;
 
-	} 
+	} */
 /*
 	html {
 		overflow-x: hidden;
 		height: 100%;
 	}
 */
-	h1 {
+	
+
+{
 		font-family: Source Sans Pro;
 		font-size: 3rem;
 		color: white;
@@ -48,13 +50,13 @@
 	}
 
 	#main {
-		padding-bottom: 110px;
+/*		padding-bottom: 110px;
 		overflow: auto;
-		margin: 0 auto;
+		margin: 0 auto; */
 	}
 
 
-
+/*
 	.logo {
 		margin: 0px auto 0px 30px;
 		
@@ -66,17 +68,6 @@
 		shape-rendering: crispEdges;
 
 	}
-
-	.navbar h1 {
-		font-family: Source Sans Pro;
-		color: white;
-		font-size: 2rem;
-
-		
-
-
-	}
-
 
 	.header-subtext {
 		color: white;
@@ -95,7 +86,7 @@
 		animation-fill-mode: forwards;
 
 	}
-
+*/
 	header {
 		/*background-color: #292929;*/
 		position: relative;
@@ -571,4 +562,21 @@ animation-duration: 2s;*/
 
 
 
+}
+
+#profile-pic {
+	height: 60px;
+	width: 60px;
+	border-radius: 30px;
+	margin-left: calc(50% - 30px);
+	margin-top: 10px;
+  }
+
+table {
+	border: none;
+	border-collapse: separate;
+}
+
+td {
+	border: none;
 }

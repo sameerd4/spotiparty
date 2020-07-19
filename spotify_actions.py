@@ -78,54 +78,6 @@ def req_token(code):
 
         return token
 
-
-def generate(token, name, desc):
-
-    spotifyObject = spotipy.Spotify(auth=token)
-
-    user_id = str(spotifyObject.current_user()['id'])
-    first_name = spotifyObject.current_user()['display_name'].split()[0]
-
-    # Get user top artists
-    user_top_artists = spotifyObject.current_user_top_artists(
-        limit=5, time_range='medium_term')
-
-    # Put top artists in dictionary
-    artist_ids = []
-    for artist in user_top_artists['items']:
-        artist_ids.append(artist['id'])
-
-    # Get list of recommended songs and put ID's in a list
-    tracks = spotifyObject.recommendations(
-        seed_artists=artist_ids, limit=50)
-    track_ids = []
-    for track in tracks['tracks']:
-        track_ids.append(track['id'])
-
-    # TO DO
-    playlist_name = "Playlist for {}".format(first_name)
-    playlist_desc = ""
-
-
-    #TO DO
-    if name:
-        playlist_name = name
-
-    if desc:
-        playlist_desc = desc
-
-    # create playlist and add to user library
-    recommended_playlist = spotifyObject.user_playlist_create(
-        user_id, playlist_name, description=playlist_desc)
-
-    recommended_playlist_id = recommended_playlist['id']
-    #add songs to playlist
-    spotifyObject.user_playlist_add_tracks(
-        user_id, recommended_playlist_id, track_ids)
-
-    return [first_name, user_id, recommended_playlist_id]
-
-
 def create_party_playlist(token, playlist_name, playlist_desc):
     spotifyObject = spotipy.Spotify(auth=token)
     user_id = str(spotifyObject.current_user()['id'])
@@ -135,10 +87,14 @@ def create_party_playlist(token, playlist_name, playlist_desc):
         playlist_name = first_name + '\'s Party'
         playlist_desc = ""
 
-    party_playlist = spotifyObject.user_playlist_create(
-        user_id, playlist_name, description=playlist_desc)
+    party_playlist = spotifyObject.user_playlist_create(user_id, playlist_name, description=playlist_desc)
+    
+    user = spotifyObject.me()
+    profile_image = "https://lh3.googleusercontent.com/eN0IexSzxpUDMfFtm-OyM-nNs44Y74Q3k51bxAMhTvrTnuA4OGnTi_fodN4cl-XxDQc" # default
+    if user['images']:
+        profile_image = user['images'][0]['url']
 
-    return [first_name, user_id, party_playlist['id']]
+    return [first_name, user_id, party_playlist['id'], profile_image]
 
 def generate(host_token, guest_tokens, playlist_id):
     spotifyObject = spotipy.Spotify(auth=host_token)
@@ -299,7 +255,7 @@ def get_user(token):
     spotifyObject = spotipy.Spotify(auth=token)
 
     user = spotifyObject.me()
-    profile_image = "https://lh3.googleusercontent.com/eN0IexSzxpUDMfFtm-OyM-nNs44Y74Q3k51bxAMhTvrTnuA4OGnTi_fodN4cl-XxDQc"
+    profile_image = "https://lh3.googleusercontent.com/eN0IexSzxpUDMfFtm-OyM-nNs44Y74Q3k51bxAMhTvrTnuA4OGnTi_fodN4cl-XxDQc" # default
     if user['images']:
         profile_image = user['images'][0]
     return [user['display_name'].split()[0], user['id'], profile_image]

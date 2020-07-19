@@ -16,9 +16,9 @@
         
         
         </style>
-	<title>Success</title>
+	<title>Your Party</title>
 	<link rel = "stylesheet" href="/static/success.css"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=yes">
 	<!-- Web icons -->
 	<link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_package_v0/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_package_v0/favicon-32x32.png">
@@ -30,6 +30,47 @@
 	<meta name="msapplication-config" content="/static/favicon_package_v0/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 </head>
+<script>
+	const interval = setInterval(function() {
+		console.log("bruh");
+		fetch('/get_party_members').then((response) => {
+		console.log(response);
+		response.json().then((data) => {
+			console.log(data);
+
+			var trHTML = '';
+				for(var i = 0; i < data.length; i++) {
+					var obj = data[i];
+					trHTML += '<tr><td>' + '<image id="profile-pic" src="' + data[i].image + '" />' + '</td><td>' + data[i].first_name + '</td></tr>';
+					console.log(obj.spotify_id);
+				}
+				console.log(trHTML);
+				document.getElementById('member_list').innerHTML = trHTML; 
+				// $('#member_list').append(trHTML);
+		});
+	});
+	 }, 5000);
+
+  </script>
+  <style>
+	  
+table {
+	margin: 0 auto;
+	border: none;
+	border-collapse: separate;
+	border-spacing: 25px;
+}
+
+td {
+	
+	font-family: Source Sans Pro;
+	position: relative;
+	font-size: 200%;
+	font-weight: 400px;
+	color: white;
+	border: none;
+}
+  </style>
 <body>	
 		<header>
         </header>
@@ -39,10 +80,13 @@
             </div>
             <div class="column">
                 <ul>
-                    <h1>Guest List:</h1>
-                    {% for member in party_members %}
-                    <h1>{{ member.first_name }}</h1>
-                    {% endfor %}
+                  <h1>Guest List:</h1>
+                  <ul>
+        
+                    <table id="member_list" border='1'>
+                    </table>
+        
+                  </ul>
                 </ul>
             </div>
           </div>

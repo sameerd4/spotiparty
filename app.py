@@ -34,8 +34,9 @@ db.app = app
 
 class User(db.Model):
     spotify_id = db.Column(db.String(50), primary_key=True)
-    playlist_id = db.Column(db.String(40), unique=False, nullable=False)
+    playlist_id = db.Column(db.String(40), unique=False, nullable=True)
     first_name = db.Column(db.String(20), unique=False, nullable=True)
+    image = db.Column(db.String(150), unique=False, nullable=True)
     auth_token = db.Column(db.String(20), unique=False, nullable=True)
     party_id = db.Column(db.Integer, unique=False, nullable=True)
     party_on = db.Column(db.BOOLEAN, unique=False, nullable=True)
@@ -44,15 +45,28 @@ class User(db.Model):
 #    party = relationship("Party", back_populates="users")
 
 
-    def __init__(self, user_id, playlist_id, first_name, token, party_id):
+    def __init__(self, user_id, playlist_id, first_name, image, token, party_id):
         self.spotify_id = user_id
         self.playlist_id = playlist_id
         self.first_name = first_name
+        self.image = image
         self.auth_token = token
         self.party_id = party_id
         self.party_on = False
 #        self.host = host
 #        self.party_on = False
+
+    @property
+    def serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'spotify_id': self.spotify_id,
+           'playlist_id': self.playlist_id,
+           'first_name': self.first_name,
+           'image': self.image,
+           'party_id': self.party_id,
+           'party_on': self.party_on
+       }
 
     def __repr__(self):
         return '<User %r>' % self.spotify_id
@@ -119,6 +133,32 @@ def callback():
 
         return redirect(url_for('options'))
 
+@app.route('/get_party_members')
+def get_party_members():
+
+    if session['spotify_id']:
+
+#        party_id = request.args.get('party_id', 0, type=int)
+        party_id = session['party_id']
+        return jsonify([i.serialize for i in get_members(party_id)])
+
+    return jsonify({'result': 'failure'})
+
+@app.route('/get_party_ids')
+def get_party_ids():
+
+    if session['spotify_id']:
+        reg_ex = ""
+
+        for id in get_parties():
+            reg_ex += str(id)
+            reg_ex += '|'
+        
+        reg_ex = reg_ex[:-1]
+        return jsonify(reg_ex)
+
+    return jsonify({'result': 'failure'})
+
 @app.route('/options')
 def options():
     return render_template('options.html')
@@ -150,6 +190,7 @@ def create_party():
         host_first_name = str(party_info[0])
         host_spotify_id = str(party_info[1])
         party_playlist_id = str(party_info[2])
+        host_image = str(party_info[3])
 
         # Store playlist ID in session
         session['spotify_id'] = host_spotify_id
@@ -166,7 +207,7 @@ def create_party():
             db.session.commit()
 
         else:
-            user = User(host_spotify_id, party_playlist_id, host_first_name, session.get('token'), party_id)
+            user = User(host_spotify_id, party_playlist_id, host_first_name, host_image, session.get('token'), party_id)
             user.party_on = False
             db.session.add(user)
             db.session.commit()
@@ -245,7 +286,7 @@ def join_party():
             db.session.commit()
 
         else:
-            user = User(user_spotify_id, party_playlist_id, user_first_name, session.get('token'), party_id)
+            user = User(user_spotify_id, party_playlist_id, user_first_name, user_image, session.get('token'), party_id)
             db.session.add(user)
             db.session.commit()
 
