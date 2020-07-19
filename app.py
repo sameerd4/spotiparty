@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import text
 from whitenoise import WhiteNoise
-
+from sqlalchemy import create_engine
 from spotify_actions import (create_party_playlist, generate, get_user,
                              req_auth, req_token)
 
@@ -77,7 +77,9 @@ print(db_file_name)
 print(path.exists(db_file_name))
 if not path.exists(db_file_name):    
 '''
-db.create_all()
+engine = create_engine(os.environ.get('DB_REDIRECT_URI'))
+if not engine.dialect.has_table(engine, 'user'):
+    db.create_all()
 
 def get_members(party_id):
     return User.query.filter_by(party_id=party_id)
@@ -148,7 +150,7 @@ def get_party_members():
 @app.route('/get_party_ids')
 def get_party_ids():
 
-    if session['spotify_id']:
+    if session['token']:
         reg_ex = ""
 
         for id in get_parties():
