@@ -820,3 +820,16 @@
 
 }
 
+#main {
+    padding-bottom: 110px;
+    overflow: auto;
+    margin: 0 auto;
+}
+
+#middle {
+    height: 450px;
+    line-height: 450px;
+    text-align: center;
+
+
+}

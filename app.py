@@ -100,7 +100,16 @@ Views
 @app.route('/')
 @app.route('/home')
 def home():
+    '''
+    # If authenticated, redirect to options page
+    if 'token' in session:
+        found_user = User.query.filter_by(auth_token=session['token']).first()
+        if found_user:
+            return redirect(url_for('options'))
+        else:
+            return render_template('home.html', title='Home')
 
+    '''
     # Home page
     return render_template('home.html', title='Home')
 

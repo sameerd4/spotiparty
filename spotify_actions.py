@@ -143,13 +143,6 @@ def generate(host_token, guest_tokens, playlist_id):
                     guest_top_tracks[(track['name'], track['id'])] += ranges[range]
                 else:
                     guest_top_tracks[(track['name'], track['id'])] = ranges[range]
-            '''
-            for track in guest_top_tracks_range:
-                if track['name'] in guest_top_tracks:
-                    guest_top_tracks[track['name']] += ranges[range]
-                else:
-                    guest_top_tracks[track['name']] = ranges[range]
-            '''
             
             guest_top_artists_range = guest_object.current_user_top_artists(limit=50, time_range=range)['items']
             
@@ -158,13 +151,6 @@ def generate(host_token, guest_tokens, playlist_id):
                     guest_top_artists[(artist['name'], artist['id'])] += ranges[range]
                 else:
                     guest_top_artists[(artist['name'], artist['id'])] = ranges[range]
-            '''
-            for artist in guest_top_artists_range:
-                if artist['name'] in guest_top_artists:
-                    guest_top_artists[artist['name']] += ranges[range]
-                else:
-                    guest_top_artists[artist['name']] = ranges[range]
-            '''
 
         top_tracks_list.append(guest_top_tracks)
         top_artists_list.append(guest_top_artists)
@@ -194,7 +180,9 @@ def generate(host_token, guest_tokens, playlist_id):
         num_tracks_to_get_from_guest = diff // len(guest_tokens)
 
         for guest_tracks_dict in top_tracks_list:
-            favorite_track_candidates.update(random.sample(list(guest_tracks_dict.keys()), num_tracks_to_get_from_guest))
+            sorted_tracks = {k: v for k, v in sorted(guest_tracks_dict.items(), key=lambda item: item[1], reverse=True)}
+            top_20_tracks_for_guest = [k for k in list(sorted_tracks)[:20]]
+            favorite_track_candidates.update(random.sample(top_20_tracks_for_guest, num_tracks_to_get_from_guest))
     else:
         favorite_track_candidates = set(random.sample(favorite_track_candidates, 20))
 
@@ -215,7 +203,9 @@ def generate(host_token, guest_tokens, playlist_id):
         num_artists_to_get_from_guest = diff // len(guest_tokens)
 
         for guest_artists_dict in top_artists_list:
-            favorite_artist_candidates.update(random.sample(list(guest_artists_dict.keys()), num_artists_to_get_from_guest))
+            sorted_artists = {k: v for k, v in sorted(guest_artists_dict.items(), key=lambda item: item[1], reverse=True)}
+            top_20_artists_for_guest = [k for k in list(sorted_tracks)[:20]]
+            favorite_artist_candidates.update(random.sample(top_20_tracks_for_guest, num_artists_to_get_from_guest))
 
     seed_artists_ids = [i[1] for i in favorite_artist_candidates]
     seed_artists_ids = random.sample(seed_artists_ids, 10)

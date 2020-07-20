@@ -580,3 +580,53 @@ border-radius: 30px;
 margin-left: calc(50% - 30px);
 margin-top: 10px;
 }
+
+.login-button img {
+	/*	width: 200px;
+		height: auto;
+		margin: 0 auto;
+		left: 200px;;
+		position: absolute;
+		top: -45px;*/
+
+		width: 200px;
+		height: auto;
+		position: relative;
+		bottom: 40px;
+
+		opacity: 0;
+		animation-name: fadein;
+		animation-delay: 1s;
+		animation-duration: 2s;
+		animation-fill-mode: forwards;
+
+    }
+    
+.login-button p {
+    z-index: 999;
+    font-family: Montserrat;
+    text-align: center;
+    position: relative;
+    top: 110px;
+    left: 16px;
+}
+
+#login-link {		
+    text-decoration: none;
+    color: white;
+
+    position: relative;
+    bottom: 40px;
+
+    opacity: 0;
+    animation-name: fadein;
+    animation-delay: 1s;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+
+
+}
+
+#login-link:hover {
+    text-decoration: underline;
+}
