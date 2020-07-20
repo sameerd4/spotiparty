@@ -298,7 +298,7 @@ def join_party():
             db.session.commit()
 
         else:
-            user = User(user_spotify_id, party_playlist_id, user_first_name, user_image, session.get('token'), party_id)
+            user = User(user_spotify_id, party_playlist_id, user_first_name, profile_image, session.get('token'), party_id)
             db.session.add(user)
             db.session.commit()
 
