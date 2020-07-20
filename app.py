@@ -294,6 +294,7 @@ def join_party():
         if found_user:
             found_user.party_id = party_id
             found_user.playlist_id = party_playlist_id
+            found_user.image = profile_image
 #            found_user.host = False
             db.session.commit()
 
