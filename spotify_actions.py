@@ -247,7 +247,7 @@ def get_user(token):
     user = spotifyObject.me()
     profile_image = "https://lh3.googleusercontent.com/eN0IexSzxpUDMfFtm-OyM-nNs44Y74Q3k51bxAMhTvrTnuA4OGnTi_fodN4cl-XxDQc" # default
     if user['images']:
-        profile_image = user['images'][0]
+        profile_image = user['images'][0]['url']
     return [user['display_name'].split()[0], user['id'], profile_image]
 
 #token1 = 'BQB8ApPzlQNocs5vyzWsxAIZjgVQrY54GVRLZWKQOo2Klm8Tr0JmURaDCAXnF43am-6ReExWhJlMg_uYoctvRs8F-70LM3pAfFjNl7xb-kXvl5sreD5YHH8pV6J1xiVdfG1K4-Biv9UXNzOVSBchv77bB9lzstyUikAsGREvkdcEYiqvulTuNJW51yg'
