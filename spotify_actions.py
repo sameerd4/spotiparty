@@ -191,7 +191,7 @@ def generate(host_token, guest_tokens, playlist_id):
         # guarantee 20 tracks are in favorite_track_candidates
         while len(favorite_track_candidates) < 10:
             track_to_add = random.choice(group_favorite_tracks_counter.most_common()) # should be a tuple like (('Money Trees', '921310892SKJAS'), 1)
-            favorite_track_candidates.update(track_to_add[0])
+            favorite_track_candidates.add(track_to_add[0])
             counter += 1
 
             if counter == 50: # fail safe, in theory the random.choice could keep pulling the same track or already be in favorite_track_candidates
@@ -222,8 +222,8 @@ def generate(host_token, guest_tokens, playlist_id):
 
         for guest_artists_dict in top_artists_list:
             sorted_artists = {k: v for k, v in sorted(guest_artists_dict.items(), key=lambda item: item[1], reverse=True)}
-            top_20_artists_for_guest = [k for k in list(sorted_tracks)[:20]]
-            favorite_artist_candidates.update(random.sample(top_20_tracks_for_guest, num_artists_to_get_from_guest))
+            top_20_artists_for_guest = [k for k in list(sorted_artists)[:20]]
+            favorite_artist_candidates.update(random.sample(top_20_artists_for_guest, num_artists_to_get_from_guest))
         
         favorite_artist_candidates.update(common_artists)
 
@@ -231,7 +231,7 @@ def generate(host_token, guest_tokens, playlist_id):
         # guarantee 10 artists are in favorite_artist_candidates
         while len(favorite_artist_candidates) < 10:
             artist_to_add = random.choice(group_favorite_artists_counter.most_common()) # should be a tuple like (('Kanye West', '921310892SKJAS'), 1)
-            favorite_artist_candidates.update(artist_to_add[0])
+            favorite_artist_candidates.add(artist_to_add[0])
             counter += 1
 
             if counter == 50: # fail safe, in theory the random.choice could keep pulling the same artists or already be in favorite_artist_candidates
