@@ -103,11 +103,11 @@ def generate(host_token, guest_tokens, playlist_id):
     # Collect collective top tracks and artists
 
 #    library_list = []
-    top_artists_list = []
-    top_tracks_list = []
+    top_artists_list = [] # list of dictionaries of guests' top artists
+    top_tracks_list = [] # list of dictionaries of guests' top tracks
 
     for guest_token in guest_tokens:
-        print(guest_token)
+        print(guest_token) # debugging
         guest_object = spotipy.Spotify(auth=guest_token)
 
         # Guest follows the playlist
@@ -131,8 +131,8 @@ def generate(host_token, guest_tokens, playlist_id):
 
         ranges = {'short_term': 8, 'medium_term': 9, 'long_term': 10}
 
-        guest_top_tracks = {}
-        guest_top_artists = {}
+        guest_top_tracks = {} # guest dictionary {(name, spotifyURI): likeScore, ...} like,  {('The Less I Know the Better, '349rh3498r'): 27, ...}
+        guest_top_artists = {} # guest dictionary  {(name, spotifyURI): likeScore, ...} like,  {('Kendrick Lamar, '349rh3498r'): 27, ...}
 
         for range in ranges.keys():   
 
@@ -159,84 +159,107 @@ def generate(host_token, guest_tokens, playlist_id):
     group_favorite_artists = [list(tadict.keys()) for tadict in top_artists_list]
 
     from itertools import chain
-    group_favorite_tracks_counter = Counter(chain(*group_favorite_tracks))
-    group_favorite_artists_counter = Counter(chain(*group_favorite_artists)) 
+    group_favorite_tracks_counter = Counter(chain(*group_favorite_tracks)) # a frequency count of everyone's collective top tracks
+    group_favorite_artists_counter = Counter(chain(*group_favorite_artists)) # a frequency count of everyone's collective top artists
 
     print(group_favorite_tracks_counter)
     print(group_favorite_artists_counter)
 
     favorite_track_candidates = set()
+    common_tracks = set()
 
     for track in group_favorite_tracks_counter:
         if group_favorite_tracks_counter[track] >= 2 and len(guest_tokens) in [2,3]:
-            favorite_track_candidates.add(track)
+            common_tracks.add(track)
         else:
             if group_favorite_tracks_counter[track] >= (len(guest_tokens) // 2):
-                favorite_track_candidates.add(track)
+                common_tracks.add(track)
 
     print(len(favorite_track_candidates))
-    if len(favorite_track_candidates) < 20:
-        diff = 20 - len(favorite_track_candidates)
+    if len(common_tracks) < 20:
+        diff = 20 - len(common_tracks)
         num_tracks_to_get_from_guest = diff // len(guest_tokens)
 
         for guest_tracks_dict in top_tracks_list:
             sorted_tracks = {k: v for k, v in sorted(guest_tracks_dict.items(), key=lambda item: item[1], reverse=True)}
             top_20_tracks_for_guest = [k for k in list(sorted_tracks)[:20]]
             favorite_track_candidates.update(random.sample(top_20_tracks_for_guest, num_tracks_to_get_from_guest))
+        
+        favorite_track_candidates.update(common_tracks)
+
+        counter = 0
+        # guarantee 20 tracks are in favorite_track_candidates
+        while len(favorite_track_candidates) < 10:
+            track_to_add = random.choice(group_favorite_tracks_counter.most_common()) # should be a tuple like (('Money Trees', '921310892SKJAS'), 1)
+            favorite_track_candidates.update(track_to_add[0])
+            counter += 1
+
+            if counter == 50: # fail safe, in theory the random.choice could keep pulling the same track or already be in favorite_track_candidates
+                break
+
     else:
-        favorite_track_candidates = set(random.sample(favorite_track_candidates, 20))
+        favorite_track_candidates = set(random.sample(common_tracks, 20))
+    
+    # favorite_track_candidates should have 20 tracks at this point, either all common tracks, 
+    # a mix of common tracks and individual favorites, or all individual favorites
 
     print(favorite_track_candidates)
     track_ids = []
     favorite_artist_candidates = set()
+    common_artists = set()
 
     for artist in group_favorite_artists_counter:
         if group_favorite_artists_counter[artist] >= 2 and len(guest_tokens) in [2,3]:
-            favorite_artist_candidates.add(artist)
+            common_artists.add(artist)
         else:
             if group_favorite_artists_counter[artist] >= (len(guest_tokens) // 2):
-                favorite_artist_candidates.add(artist)
+                common_artists.add(artist)
 
-    print(len(favorite_artist_candidates))
-    if len(favorite_artist_candidates) < 20:
-        diff = 20 - len(favorite_artist_candidates)
+    print(len(common_artists))
+    if len(common_artists) < 10:
+        diff = 10 - len(common_artists)
         num_artists_to_get_from_guest = diff // len(guest_tokens)
 
         for guest_artists_dict in top_artists_list:
             sorted_artists = {k: v for k, v in sorted(guest_artists_dict.items(), key=lambda item: item[1], reverse=True)}
             top_20_artists_for_guest = [k for k in list(sorted_tracks)[:20]]
             favorite_artist_candidates.update(random.sample(top_20_tracks_for_guest, num_artists_to_get_from_guest))
-
-    seed_artists_ids = [i[1] for i in favorite_artist_candidates]
-    seed_artists_ids = random.sample(seed_artists_ids, 10)
-
-    if len(guest_tokens) > 1:
-        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
-        for track in recommended_tracks['tracks']:
-            track_ids.append(track['id'])
         
-        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
-        for track in recommended_tracks['tracks']:
-            track_ids.append(track['id'])
+        favorite_artist_candidates.update(common_artists)
+
+        counter = 0
+        # guarantee 10 artists are in favorite_artist_candidates
+        while len(favorite_artist_candidates) < 10:
+            artist_to_add = random.choice(group_favorite_artists_counter.most_common()) # should be a tuple like (('Kanye West', '921310892SKJAS'), 1)
+            favorite_artist_candidates.update(artist_to_add[0])
+            counter += 1
+
+            if counter == 50: # fail safe, in theory the random.choice could keep pulling the same artists or already be in favorite_artist_candidates
+                break
 
     else:
-        top_artists_ids = [i[1] for i in favorite_artist_candidates]
-        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
-        for track in recommended_tracks['tracks']:
-            track_ids.append(track['id'])
-        
-        recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:10], limit=15)
-        for track in recommended_tracks['tracks']:
-            track_ids.append(track['id'])
+        favorite_artist_candidates = set(random.sample(common_artists, 10))
+    
+    seed_artists_ids = [i[1] for i in favorite_artist_candidates]
 
+    # collect recommendations
+    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[:5], limit=15)
+    for track in recommended_tracks['tracks']:
+        track_ids.append(track['id'])
+    
+    recommended_tracks = spotifyObject.recommendations(seed_artists=seed_artists_ids[5:], limit=15)
+    for track in recommended_tracks['tracks']:
+        track_ids.append(track['id'])
+
+    # add in favorite_track_candidates
     track_ids.extend([i[1] for i in favorite_track_candidates])
 
     print(track_ids)
 
-    
+    # shuffle tracks around
     random.shuffle(track_ids)
 
-
+    # add to playlist
     spotifyObject.user_playlist_add_tracks(
         host_id, playlist_id, track_ids)
 
